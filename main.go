@@ -1,7 +1,65 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+	"time"
+)
 
 func main() {
-	fmt.Println("Hello, world!")
+	fork1 := make(chan int, 1)
+	fork2 := make(chan int, 1)
+	fork3 := make(chan int, 1)
+	fork4 := make(chan int, 1)
+	fork5 := make(chan int, 1)
+
+	go fork(fork1)
+	go fork(fork2)
+	go fork(fork3)
+	go fork(fork4)
+	go fork(fork5)
+
+	go Philosopher(fork1, fork5, "Plato, ")
+	go Philosopher(fork1, fork2, "Sun Tzu")
+	go Philosopher(fork2, fork3, "Sokrates")
+	go Philosopher(fork3, fork4, "Voltaire")
+	go Philosopher(fork4, fork5, "René Descartes")
+	for {
+	}
+}
+
+func fork(me chan int) {
+	me <- 1
+	/*
+		id := i
+		var Available bool = true
+		var PhilosopherSlice []int
+	*/
+}
+
+func Philosopher(forkleft chan int, forkright chan int, name string) {
+	eatCount := 0
+	for {
+		if TryEat(forkleft, forkright) {
+			<-forkleft
+			<-forkright
+			eatCount++
+			time.Sleep(time.Duration(rand.Intn(200)) * time.Millisecond)
+			fmt.Println("I, the one and only: ", name, " have eaten ", eatCount, " times")
+			forkright <- 1
+			forkleft <- 1
+			fmt.Println(name, " is thinking")
+			time.Sleep(time.Duration(rand.Intn(200)) * time.Millisecond)
+		} else {
+			fmt.Println(name, " is thinking")
+			time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
+		}
+	}
+}
+
+func TryEat(forkleft chan int, forkright chan int) bool {
+	if len(forkleft) == 1 && len(forkright) == 1 {
+		return true
+	}
+	return false
 }
