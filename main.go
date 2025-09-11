@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+/*
+*
+ */
 func main() {
 	fork1 := make(chan int, 1)
 	fork2 := make(chan int, 1)
@@ -30,16 +33,12 @@ func main() {
 
 func fork(me chan int) {
 	me <- 1
-	/*
-		id := i
-		var Available bool = true
-		var PhilosopherSlice []int
-	*/
 }
 
 func Philosopher(forkleft chan int, forkright chan int, name string) {
 	eatCount := 0
 	for {
+		//
 		if TryEat(forkleft, forkright) {
 			<-forkleft
 			<-forkright
@@ -51,6 +50,10 @@ func Philosopher(forkleft chan int, forkright chan int, name string) {
 			fmt.Println(name, " is thinking")
 			time.Sleep(time.Duration(rand.Intn(200)) * time.Millisecond)
 		} else {
+			//If a philosopher cannot pick up a total of two forks, they will instead think and then try again.
+			//In this way, there will never be a scenario where every philosopher has 1 fork each.
+			//Additionally to avoid the same philosophers eating again and again, they will stop
+			//to think after eating giving the others a chance to grab the forks
 			fmt.Println(name, " is thinking")
 			time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
 		}
