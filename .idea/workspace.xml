@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="40d52b05-9818-40e9-b9f7-f41e7ce3a835" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/small_itu_database_2025.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/small_itu_database_2025 3.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/client/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grpc/proto.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/grpc/proto.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grpc/proto_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/grpc/proto_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.go" afterDir="false" />
+    </list>
+    <list id="f6ebff3c-a63b-467e-8a98-749b3b6c2467" name="Changes by chris" comment="">
+      <change beforePath="$PROJECT_DIR$/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/client/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.go" afterDir="false" />
+    </list>
+    <list id="99212ff2-b1d4-4430-a60c-7775bc3766cb" name="Changes by sebastianhsvendsen" comment="">
+      <change beforePath="$PROJECT_DIR$/grpc/proto.proto" beforeDir="false" afterPath="$PROJECT_DIR$/grpc/proto.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.go" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file:///usr/local/go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/client/client.go">
+      <ranges>
+        <range start1="4" end1="4" start2="4" end2="5" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="5" end1="5" start2="6" end2="8" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="6" end1="6" start2="9" end2="10" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="12" end1="12" start2="16" end2="17" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="16" end1="16" start2="21" end2="22" changelist="f6ebff3c-a63b-467e-8a98-749b3b6c2467" />
+        <range start1="17" end1="20" start2="23" end2="25" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="21" end1="26" start2="26" end2="27" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="27" end1="27" start2="28" end2="90" changelist="f6ebff3c-a63b-467e-8a98-749b3b6c2467" />
+      </ranges>
+    </file>
+    <file path="$PROJECT_DIR$/server/server.go">
+      <ranges>
+        <range start1="4" end1="5" start2="4" end2="6" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="7" end1="7" start2="8" end2="10" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="12" end1="14" start2="15" end2="21" changelist="f6ebff3c-a63b-467e-8a98-749b3b6c2467" />
+        <range start1="15" end1="15" start2="22" end2="37" changelist="99212ff2-b1d4-4430-a60c-7775bc3766cb" />
+        <range start1="16" end1="20" start2="38" end2="38" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="21" end1="27" start2="39" end2="41" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="31" end1="32" start2="45" end2="45" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="34" end1="35" start2="47" end2="48" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="37" end1="39" start2="50" end2="54" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="42" end1="43" start2="57" end2="58" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="44" end1="45" start2="59" end2="59" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
+        <range start1="47" end1="47" start2="61" end2="178" changelist="f6ebff3c-a63b-467e-8a98-749b3b6c2467" />
+      </ranges>
+    </file>
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="34h5xRFIgKBF0vUepDl5WoMj8Nx" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "git-widget-placeholder": "main",
+    "go.import.settings.migrated": "true",
+    "go.sdk.automatically.set": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/Users/andreasschioettmac/Documents/ITU/3.semester/DistributedSystems/DistributedSystems/small_itu_database_2025 3",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-gosdk-f466f9b0953e-3d2cccfc42a2-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-252.23892.530" />
+        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-GO-252.23892.530" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="40d52b05-9818-40e9-b9f7-f41e7ce3a835" name="Changes" comment="" />
+      <created>1761653208051</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1761653208051</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+</project>

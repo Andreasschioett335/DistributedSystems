@@ -1,0 +1,38 @@
+syntax = "proto3";
+package chitchat;
+option go_package = "ITUServer/grpc/proto";
+
+
+message Empty {}
+
+message ClientJoin {
+  string name = 1;
+}
+message ChatMessage {
+  string text = 1;
+}
+message ClientLeave {
+  string leave = 1;
+}
+
+message ClientMessage {
+  string client_id = 1;
+  oneof payload {
+    ClientJoin join = 2;
+    ClientLeave leave = 3;
+    ChatMessage Message = 4;
+  }
+}
+
+message ServerEvent {
+  string event_type = 1;
+  string content = 2;
+  int64 logical_time = 3;
+  string from_client_id = 4;
+  string from_client_name = 5;
+}
+
+service ChitChat {
+  // Client opens a bidirectional stream for sending and receiving messages.
+  rpc Chat(stream ClientMessage) returns (stream ServerEvent);
+}

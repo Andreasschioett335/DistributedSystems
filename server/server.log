@@ -1,0 +1,11 @@
+2025/10/28 19:04:49.433780 [Server] [Startup] Server started on: [::]:5050
+2025/10/28 19:04:51.670548 [Server] [Connect] [ClientID: c-1]
+2025/10/28 19:04:51.670819 [Server] [Join] [ClientID: c-1] [Name: Me]
+2025/10/28 19:04:54.100083 [Server] [Connect] [ClientID: c-2]
+2025/10/28 19:04:54.100118 [Server] [Join] [ClientID: c-2] [Name: Me]
+2025/10/28 19:04:58.883683 [Server] [Connect] [ClientID: c-3]
+2025/10/28 19:04:58.883722 [Server] [Join] [ClientID: c-3] [Name: Me]
+2025/10/28 19:05:01.879630 [Server] [Leave] [ClientID: c-3] [Name: Me]
+2025/10/28 19:05:01.879822 [Server] [Disconnect] [ClientID: c-3] [Name: (anon)]
+2025/10/28 19:05:04.133660 [Server] [Message] [ClientID: c-2] [Name: Me] frank
+2025/10/28 19:05:07.364799 [Server] [Message] [ClientID: c-1] [Name: Me] test
