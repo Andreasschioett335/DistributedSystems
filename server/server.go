@@ -12,12 +12,10 @@ import (
 	"google.golang.org/grpc"
 )
 
+// Server implementation of ChitChat
 type ITU_databaseServer struct {
 	proto.UnimplementedChitChatServer
 	clients map[string]*client
-	clock   int64
-	idSeq   uint64
-	conn    *grpc.Server
 	mutex   sync.Mutex
 }
 
@@ -27,74 +25,71 @@ type client struct {
 	send chan *proto.ServerEvent
 }
 
-type server struct {
-	clients map[string]*client
-	clock   int64
-	idSeq   uint64
-	conn    *grpc.Server
-}
-
 var nextID int64
 
 func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
 	server := &ITU_databaseServer{clients: make(map[string]*client)}
-	server.start_server()
+	server.startServer()
 }
 
-func (s *ITU_databaseServer) start_server() {
+// Start gRPC server
+func (s *ITU_databaseServer) startServer() {
 	listener, err := net.Listen("tcp", ":5050")
 	if err != nil {
-		log.Fatalf("Failled to listen: %v", err)
+		log.Fatalf("[Server] [StartupError] Failed to listen: %v", err)
 	}
 
 	grpcServer := grpc.NewServer()
 	proto.RegisterChitChatServer(grpcServer, s)
-	log.Printf("[Server] [Startup] Server started on: %v", listener.Addr())
-	defer log.Printf("[Server] [Shutdown] Server shutting down")
-	err = grpcServer.Serve(listener)
 
-	if err != nil {
-		log.Fatalf("Failed to serve at: %v", err)
+	log.Printf("[Server] [Startup] Server started on %v", listener.Addr())
+	defer log.Printf("[Server] [Shutdown] Server shutting down")
+
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("[Server] [ServeError] %v", err)
 	}
 }
 
+// Add client to list
 func (s *ITU_databaseServer) addClient(c *client) {
 	s.mutex.Lock()
 	s.clients[c.id] = c
 	s.mutex.Unlock()
-	log.Printf("[Server] [Connect] [ClientID: %s]", c.id)
+	log.Printf("[Server] [Connect] [ClientID: %s] [Name: %s]", c.id, c.name)
 }
 
+// Remove client from list
 func (s *ITU_databaseServer) removeClient(id string) {
 	s.mutex.Lock()
 	if c, ok := s.clients[id]; ok {
 		delete(s.clients, id)
 		close(c.send)
-		log.Printf("[Server] [Disconnect] [ClientID: %s] [Name: %s]", id, c.name)
+		log.Printf("[Server] [Disconnect] [ClientID: %s] [Name: %s]", c.id, c.name)
 	}
 	s.mutex.Unlock()
 }
 
+// Broadcast event to all clients
 func (s *ITU_databaseServer) broadcast(ev *proto.ServerEvent) {
 	s.mutex.Lock()
 	for _, c := range s.clients {
 		select {
 		case c.send <- ev:
 		default:
-			// drop if a client is too slow; keeps server simple
+			// drop if client is slow
 		}
 	}
 	s.mutex.Unlock()
 }
 
+// Handle client connection and message stream
 func (s *ITU_databaseServer) Chat(stream proto.ChitChat_ChatServer) error {
 	id := fmt.Sprintf("c-%d", atomic.AddInt64(&nextID, 1))
-	name := "(anon)"
 
 	c := &client{
 		id:   id,
-		name: name,
+		name: "(anon)",
 		send: make(chan *proto.ServerEvent, 32),
 	}
 	s.addClient(c)
@@ -111,18 +106,19 @@ func (s *ITU_databaseServer) Chat(stream proto.ChitChat_ChatServer) error {
 		sendErr <- nil
 	}()
 
+	// Broadcast connection
 	s.broadcast(&proto.ServerEvent{
 		EventType:      "system",
-		Content:        fmt.Sprintf("%s connected", id),
+		Content:        fmt.Sprintf("%s connected", c.id),
 		LogicalTime:    0,
-		FromClientId:   id,
-		FromClientName: name,
+		FromClientId:   c.id,
+		FromClientName: c.name,
 	})
+	log.Printf("[Server] [System] [ClientID: %s] [Name: %s] Connected", c.id, c.name)
 
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
-			// client closed sending side
 			break
 		}
 		if err != nil {
@@ -130,45 +126,49 @@ func (s *ITU_databaseServer) Chat(stream proto.ChitChat_ChatServer) error {
 		}
 
 		switch pl := in.Payload.(type) {
+
+		// When client joins
 		case *proto.ClientMessage_Join:
-			name = pl.Join.Name
+			c.name = pl.Join.Name // ✅ update name globally
 			s.broadcast(&proto.ServerEvent{
 				EventType:      "join",
-				Content:        fmt.Sprintf("%s joined", name),
+				Content:        fmt.Sprintf("%s joined ChitChat", c.name),
 				LogicalTime:    0,
-				FromClientId:   id,
-				FromClientName: name,
+				FromClientId:   c.id,
+				FromClientName: c.name,
 			})
-			log.Printf("[Server] [Join] [ClientID: %s] [Name: %s]", id, name)
+			//log.Printf("[Server] [Join] [ClientID: %s] [Name: %s] Joined ChitChat", c.id, c.name)
 
+		// When client sends a chat message
 		case *proto.ClientMessage_Message:
 			s.broadcast(&proto.ServerEvent{
 				EventType:      "message",
 				Content:        pl.Message.Text,
 				LogicalTime:    0,
-				FromClientId:   id,
-				FromClientName: name,
+				FromClientId:   c.id,
+				FromClientName: c.name,
 			})
-			log.Printf("[Server] [Message] [ClientID: %s] [Name: %s] %s", id, name, pl.Message.Text)
+			log.Printf("[Server] [Message] [ClientID: %s] [Name: %s] %s",
+				c.id, c.name, pl.Message.Text)
 
+		// When client leaves
 		case *proto.ClientMessage_Leave:
-			// send a leave event and end the stream
 			s.broadcast(&proto.ServerEvent{
 				EventType:      "leave",
-				Content:        pl.Leave.Leave,
+				Content:        fmt.Sprintf("%s left ChitChat", c.name),
 				LogicalTime:    0,
-				FromClientId:   id,
-				FromClientName: name,
+				FromClientId:   c.id,
+				FromClientName: c.name,
 			})
-			log.Printf("[Server] [Leave] [ClientID: %s] [Name: %s]", id, name)
-
+			//log.Printf("[Server] [Leave] [ClientID: %s] [Name: %s]", c.id, c.name)
 			return nil
 
 		default:
-			// ignore unknown payloads
+			log.Printf("[Server] [UnknownPayload] [ClientID: %s] [Name: %s] Ignored unknown message type",
+				c.id, c.name)
 		}
 	}
-	// also drain sender end result (non-blocking)
+
 	select {
 	case <-sendErr:
 	default:
