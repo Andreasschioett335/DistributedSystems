@@ -17,10 +17,11 @@ message ClientLeave {
 
 message ClientMessage {
   string client_id = 1;
+  int64 logical_time = 2;
   oneof payload {
-    ClientJoin join = 2;
-    ClientLeave leave = 3;
-    ChatMessage Message = 4;
+    ClientJoin join = 3;
+    ClientLeave leave = 4;
+    ChatMessage Message = 5;
   }
 }
 

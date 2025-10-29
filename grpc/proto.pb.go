@@ -190,8 +190,9 @@ func (x *ClientLeave) GetLeave() string {
 }
 
 type ClientMessage struct {
-	state    protoimpl.MessageState `protogen:"open.v1"`
-	ClientId string                 `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	ClientId    string                 `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	LogicalTime int64                  `protobuf:"varint,2,opt,name=logical_time,json=logicalTime,proto3" json:"logical_time,omitempty"`
 	// Types that are valid to be assigned to Payload:
 	//
 	//	*ClientMessage_Join
@@ -239,6 +240,13 @@ func (x *ClientMessage) GetClientId() string {
 	return ""
 }
 
+func (x *ClientMessage) GetLogicalTime() int64 {
+	if x != nil {
+		return x.LogicalTime
+	}
+	return 0
+}
+
 func (x *ClientMessage) GetPayload() isClientMessage_Payload {
 	if x != nil {
 		return x.Payload
@@ -278,15 +286,15 @@ type isClientMessage_Payload interface {
 }
 
 type ClientMessage_Join struct {
-	Join *ClientJoin `protobuf:"bytes,2,opt,name=join,proto3,oneof"`
+	Join *ClientJoin `protobuf:"bytes,3,opt,name=join,proto3,oneof"`
 }
 
 type ClientMessage_Leave struct {
-	Leave *ClientLeave `protobuf:"bytes,3,opt,name=leave,proto3,oneof"`
+	Leave *ClientLeave `protobuf:"bytes,4,opt,name=leave,proto3,oneof"`
 }
 
 type ClientMessage_Message struct {
-	Message *ChatMessage `protobuf:"bytes,4,opt,name=Message,proto3,oneof"`
+	Message *ChatMessage `protobuf:"bytes,5,opt,name=Message,proto3,oneof"`
 }
 
 func (*ClientMessage_Join) isClientMessage_Payload() {}
@@ -383,12 +391,13 @@ const file_proto_proto_rawDesc = "" +
 	"\vChatMessage\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\"#\n" +
 	"\vClientLeave\x12\x14\n" +
-	"\x05leave\x18\x01 \x01(\tR\x05leave\"\xc5\x01\n" +
+	"\x05leave\x18\x01 \x01(\tR\x05leave\"\xe8\x01\n" +
 	"\rClientMessage\x12\x1b\n" +
-	"\tclient_id\x18\x01 \x01(\tR\bclientId\x12*\n" +
-	"\x04join\x18\x02 \x01(\v2\x14.chitchat.ClientJoinH\x00R\x04join\x12-\n" +
-	"\x05leave\x18\x03 \x01(\v2\x15.chitchat.ClientLeaveH\x00R\x05leave\x121\n" +
-	"\aMessage\x18\x04 \x01(\v2\x15.chitchat.ChatMessageH\x00R\aMessageB\t\n" +
+	"\tclient_id\x18\x01 \x01(\tR\bclientId\x12!\n" +
+	"\flogical_time\x18\x02 \x01(\x03R\vlogicalTime\x12*\n" +
+	"\x04join\x18\x03 \x01(\v2\x14.chitchat.ClientJoinH\x00R\x04join\x12-\n" +
+	"\x05leave\x18\x04 \x01(\v2\x15.chitchat.ClientLeaveH\x00R\x05leave\x121\n" +
+	"\aMessage\x18\x05 \x01(\v2\x15.chitchat.ChatMessageH\x00R\aMessageB\t\n" +
 	"\apayload\"\xb9\x01\n" +
 	"\vServerEvent\x12\x1d\n" +
 	"\n" +
