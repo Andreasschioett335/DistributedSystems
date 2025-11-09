@@ -53,3 +53,17 @@
 2025/10/29 19:10:49.880346 [Server] [Clock:27] [Broadcast] [From: 2] -> [To: 2] [Event: message] hej
 2025/10/29 19:10:49.880389 [Server] [Clock:27] [Message] [ClientID: c-2] [Name: 2] Sent: hej
 2025/10/29 19:10:49.880576 [Client] [Clock:28] [Received] [From: 2] -> [Event: message] hej
+2025/10/29 19:21:15.172381 [Server] [Clock:1] [Startup] Server started on [::]:5050
+2025/10/29 19:21:25.206857 [Server] [Clock:2] [Connect] [ClientID: c-1] [Name: (anon)]
+2025/10/29 19:21:25.207030 [Server] [Clock:3] [Broadcast] [From: (anon)] -> [To: (anon)] [Event: system] c-1 connected
+2025/10/29 19:21:25.207043 [Server] [Clock:3] [System] [ClientID: c-1] [Name: (anon)] Connected
+2025/10/29 19:21:26.113971 [Client] [Clock:1] [Join] [Name: test]
+2025/10/29 19:21:26.114264 [Server] [Clock:5] [Broadcast] [From: test] -> [To: test] [Event: join] test joined ChitChat
+2025/10/29 19:21:26.114278 [Server] [Clock:5] [Join] [ClientID: c-1] [Name: test] Joined ChitChat
+2025/10/29 19:21:26.114301 [Client] [Clock:4] [Received] [From: (anon)] -> [Event: system] c-1 connected
+2025/10/29 19:21:26.114340 [Client] [Clock:6] [Received] [From: test] -> [Event: join] test joined ChitChat
+2025/10/29 19:21:27.302078 [Client] [Clock:7] [Message] [Name: test] Sent: l
+2025/10/29 19:21:27.302781 [Server] [Clock:8] [Broadcast] [From: test] -> [To: test] [Event: message] l
+2025/10/29 19:21:27.302894 [Server] [Clock:8] [Message] [ClientID: c-1] [Name: test] Sent: l
+2025/10/29 19:21:27.303210 [Client] [Clock:9] [Received] [From: test] -> [Event: message] l
+2025/10/29 19:21:28.852436 [Server] [Clock:9] [Disconnect] [ClientID: c-1] [Name: test]
