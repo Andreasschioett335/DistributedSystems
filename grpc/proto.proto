@@ -1,39 +1,30 @@
 syntax = "proto3";
-package chitchat;
-option go_package = "ITUServer/grpc/proto";
 
+option go_package = "ITUServer/grpc";
 
-message Empty {}
+package mutex;
 
-message ClientJoin {
-  string name = 1;
-}
-message ChatMessage {
-  string text = 1;
-}
-message ClientLeave {
-  string leave = 1;
+// Service for Ricart-Agrawala mutual exclusion
+service MutexService {
+  // Request access to critical section
+  rpc Request(RequestMessage) returns (ReplyMessage);
+
+  // Reply to a request (used for deferred replies)
+  rpc Reply(ReplyMessage) returns (Ack);
 }
 
-message ClientMessage {
-  string client_id = 1;
-  int64 logical_time = 2;
-  oneof payload {
-    ClientJoin join = 3;
-    ClientLeave leave = 4;
-    ChatMessage Message = 5;
-  }
+// Request message sent when a node wants to enter critical section
+message RequestMessage {
+  string node_id = 1;      // ID of the requesting node
+  int64 timestamp = 2;      // Lamport timestamp of the request
 }
 
-message ServerEvent {
-  string event_type = 1;
-  string content = 2;
-  int64 logical_time = 3;
-  string from_client_id = 4;
-  string from_client_name = 5;
+// Reply message sent to grant permission
+message ReplyMessage {
+  string node_id = 1;      // ID of the replying node
 }
 
-service ChitChat {
-  // Client opens a bidirectional stream for sending and receiving messages.
-  rpc Chat(stream ClientMessage) returns (stream ServerEvent);
+// Acknowledgment message
+message Ack {
+  // Empty acknowledgment
 }
