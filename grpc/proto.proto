@@ -1,8 +1,7 @@
 syntax = "proto3";
 
-option go_package = "ITUServer/grpc";
-
 package mutex;
+option go_package = "DistributedSystems/mutexpb";
 
 // Service for Ricart-Agrawala mutual exclusion
 service MutexService {

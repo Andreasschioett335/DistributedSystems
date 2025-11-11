@@ -1,6 +1,6 @@
 module ITUServer
 
-go 1.24.0
+go 1.25.0
 
 require (
 	google.golang.org/grpc v1.76.0
@@ -8,7 +8,6 @@ require (
 )
 
 require (
-	github.com/golang/protobuf v1.5.4 // indirect
 	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/text v0.30.0 // indirect

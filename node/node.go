@@ -1,7 +1,8 @@
 package main
 
 import (
-	proto "ITUServer/grpc"
+	Proto "DistributedSystems/grpc"
+
 	"context"
 	"fmt"
 	"log"
@@ -12,11 +13,12 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 )
 
 type NodeState int
-
 const (
 	RELEASED NodeState = iota
 	WANTED
@@ -24,7 +26,8 @@ const (
 )
 
 type Node struct {
-	proto.UnimplementedMutexServiceServer
+	Proto.UnimplementedMutexServiceServer
+
 	id             string
 	port           string
 	lamportClock   int64
@@ -41,7 +44,7 @@ type Node struct {
 type PeerConnection struct {
 	id     string
 	addr   string
-	client proto.MutexServiceClient
+	client Proto.MutexServiceClient
 	conn   *grpc.ClientConn
 }
 
@@ -90,7 +93,7 @@ func (n *Node) connectToPeer(peerId, addr string) {
 	// Retry connection with backoff
 	maxRetries := 10
 	for i := 0; i < maxRetries; i++ {
-		conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			log.Printf("[Node:%s] [Clock:%d] [Discovery] Failed to connect to %s (attempt %d/%d): %v",
 				n.id, n.lamportClock, peerId, i+1, maxRetries, err)
@@ -98,7 +101,7 @@ func (n *Node) connectToPeer(peerId, addr string) {
 			continue
 		}
 
-		client := proto.NewMutexServiceClient(conn)
+		client := Proto.NewMutexServiceClient(conn)
 		n.peers[peerId] = &PeerConnection{
 			id:     peerId,
 			addr:   addr,
@@ -120,7 +123,7 @@ func (n *Node) Start() {
 	}
 
 	grpcServer := grpc.NewServer()
-	proto.RegisterMutexServiceServer(grpcServer, n)
+	Proto.RegisterMutexServiceServer(grpcServer, n)
 
 	n.incrementClock()
 	log.Printf("[Node:%s] [Clock:%d] [Startup] Node started on %s", n.id, n.lamportClock, n.port)
@@ -137,8 +140,7 @@ func (n *Node) Start() {
 }
 
 func (n *Node) simulateRequests() {
-	// Wait for all nodes to start
-	time.Sleep(3 * time.Second)
+	time.Sleep(10 * time.Second)
 
 	for i := 0; i < 3; i++ {
 		// Random delay between requests
@@ -179,9 +181,10 @@ func (n *Node) RequestCriticalSection() {
 		go n.sendRequest(peer, timestamp)
 	}
 
-	// Wait for all replies
 	for i := 0; i < len(n.peers); i++ {
 		<-n.replyChan
+		log.Printf("[Node:%s] [Clock:%d] [Grant] Received grant %d/%d",
+			n.id, n.lamportClock, i+1, len(n.peers))
 	}
 
 	n.mu.Lock()
@@ -202,7 +205,7 @@ func (n *Node) sendRequest(peer *PeerConnection, timestamp int64) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	req := &proto.RequestMessage{
+	req := &Proto.RequestMessage{
 		NodeId:    n.id,
 		Timestamp: timestamp,
 	}
@@ -210,48 +213,55 @@ func (n *Node) sendRequest(peer *PeerConnection, timestamp int64) {
 	log.Printf("[Node:%s] [Clock:%d] [Send] Sending REQUEST to %s with timestamp %d",
 		n.id, timestamp, peer.id, timestamp)
 
-	_, err := peer.client.Request(ctx, req)
-	if err != nil {
-		log.Printf("[Node:%s] [Clock:%d] [Error] Failed to send request to %s: %v",
-			n.id, n.lamportClock, peer.id, err)
+	if _, err := peer.client.Request(ctx, req); err == nil {
+		n.replyChan <- true
+		return
+	} else {
+		if status.Code(err) != codes.Aborted {
+			log.Printf("[Node:%s] [Clock:%d] [Error] Request to %s failed: %v",
+				n.id, n.lamportClock, peer.id, err)
+		} else {
+			log.Printf("[Node:%s] [Clock:%d] [Defer] %s deferred our request (will Reply later)",
+				n.id, n.lamportClock, peer.id)
+		}
 	}
 }
 
-func (n *Node) Request(ctx context.Context, req *proto.RequestMessage) (*proto.ReplyMessage, error) {
+//Receiving a request
+func (n *Node) Request(ctx context.Context, req *Proto.RequestMessage) (*Proto.ReplyMessage, error) {
 	n.updateClock(req.Timestamp)
 
 	log.Printf("[Node:%s] [Clock:%d] [Receive] Received REQUEST from %s with timestamp %d",
 		n.id, n.lamportClock, req.NodeId, req.Timestamp)
 
 	n.mu.Lock()
-	defer n.mu.Unlock()
-
 	shouldDefer := false
-	if n.state == HELD {
+	switch n.state {
+	case HELD:
 		shouldDefer = true
-	} else if n.state == WANTED {
-		// Compare timestamps, use node ID as tiebreaker
-		if n.requestTime < req.Timestamp {
-			shouldDefer = true
-		} else if n.requestTime == req.Timestamp && n.id < req.NodeId {
+	case WANTED:
+		if n.requestTime < req.Timestamp || (n.requestTime == req.Timestamp && n.id < req.NodeId) {
 			shouldDefer = true
 		}
 	}
-
 	if shouldDefer {
+		n.deferredQueue = append(n.deferredQueue, req.NodeId)
+		n.mu.Unlock()
+
 		log.Printf("[Node:%s] [Clock:%d] [Defer] Deferring reply to %s (MyState:%v, MyTime:%d, TheirTime:%d)",
 			n.id, n.lamportClock, req.NodeId, n.state, n.requestTime, req.Timestamp)
-		n.deferredQueue = append(n.deferredQueue, req.NodeId)
-		return &proto.ReplyMessage{NodeId: n.id}, nil
-	}
 
-	log.Printf("[Node:%s] [Clock:%d] [Send] Sending immediate REPLY to %s",
+		return nil, status.Error(codes.Aborted, "deferred")
+	}
+	n.mu.Unlock()
+
+	log.Printf("[Node:%s] [Clock:%d] [Grant] Granting REQUEST to %s immediately",
 		n.id, n.lamportClock, req.NodeId)
 
-	return &proto.ReplyMessage{NodeId: n.id}, nil
+	return &Proto.ReplyMessage{NodeId: n.id}, nil
 }
 
-func (n *Node) Reply(ctx context.Context, reply *proto.ReplyMessage) (*proto.Ack, error) {
+func (n *Node) Reply(ctx context.Context, reply *Proto.ReplyMessage) (*Proto.Ack, error) {
 	n.incrementClock()
 
 	log.Printf("[Node:%s] [Clock:%d] [Receive] Received REPLY from %s",
@@ -263,7 +273,7 @@ func (n *Node) Reply(ctx context.Context, reply *proto.ReplyMessage) (*proto.Ack
 
 	n.replyChan <- true
 
-	return &proto.Ack{}, nil
+	return &Proto.Ack{}, nil
 }
 
 func (n *Node) executeCriticalSection() {
@@ -285,9 +295,11 @@ func (n *Node) executeCriticalSection() {
 
 	entry := fmt.Sprintf("[%s] Node %s entered critical section at Lamport time %d\n",
 		time.Now().Format("15:04:05.000"), n.id, n.lamportClock)
-	f.WriteString(entry)
+	if _, err := f.WriteString(entry); err != nil {
+		log.Printf("[Node:%s] [Clock:%d] [Error] Failed to write shared entry: %v",
+			n.id, n.lamportClock, err)
+	}
 
-	// Simulate work
 	time.Sleep(2 * time.Second)
 
 	log.Printf("[Node:%s] [Clock:%d] [CriticalSection] Completed critical operation",
@@ -321,13 +333,12 @@ func (n *Node) sendDeferredReply(peer *PeerConnection) {
 	defer cancel()
 
 	n.incrementClock()
-	reply := &proto.ReplyMessage{NodeId: n.id}
+	reply := &Proto.ReplyMessage{NodeId: n.id}
 
 	log.Printf("[Node:%s] [Clock:%d] [Send] Sending deferred REPLY to %s",
 		n.id, n.lamportClock, peer.id)
 
-	_, err := peer.client.Reply(ctx, reply)
-	if err != nil {
+	if _, err := peer.client.Reply(ctx, reply); err != nil {
 		log.Printf("[Node:%s] [Clock:%d] [Error] Failed to send deferred reply to %s: %v",
 			n.id, n.lamportClock, peer.id, err)
 	}
@@ -338,11 +349,11 @@ func (n *Node) Close() {
 	log.Printf("[Node:%s] [Clock:%d] [Shutdown] Node shutting down", n.id, n.lamportClock)
 
 	for _, peer := range n.peers {
-		peer.conn.Close()
+		_ = peer.conn.Close()
 	}
 
 	if n.logFile != nil {
-		n.logFile.Close()
+		_ = n.logFile.Close()
 	}
 }
 
