@@ -1,0 +1,47 @@
+2025/11/12 19:45:30.901590 [Node:1] [Clock:0] [Discovery] Attempting to connect to peer 2 at localhost:5052
+2025/11/12 19:45:30.901781 [Node:1] [Clock:0] [Discovery] Successfully connected to peer 2
+2025/11/12 19:45:30.901791 [Node:1] [Clock:0] [Discovery] Attempting to connect to peer 3 at localhost:5053
+2025/11/12 19:45:30.901837 [Node:1] [Clock:0] [Discovery] Successfully connected to peer 3
+2025/11/12 19:45:30.902960 [Node:1] [Clock:1] [Startup] Node started on localhost:5051
+2025/11/12 19:45:44.624006 [Node:1] [Clock:3] [Receive] Received REQUEST from 2 with timestamp 2
+2025/11/12 19:45:44.624019 [Node:1] [Clock:3] [Grant] Granting REQUEST to 2 immediately
+2025/11/12 19:45:47.911691 [Node:1] [Clock:4] [Request] Requesting Critical Section at time 4
+2025/11/12 19:45:47.911735 [Node:1] [Clock:4] [Send] Sending REQUEST to 3 with timestamp 4
+2025/11/12 19:45:47.911745 [Node:1] [Clock:4] [Send] Sending REQUEST to 2 with timestamp 4
+2025/11/12 19:45:47.912007 [Node:1] [Clock:4] [Grant] Received grant 1/2
+2025/11/12 19:45:47.912023 [Node:1] [Clock:4] [Grant] Received grant 2/2
+2025/11/12 19:45:47.912029 [Node:1] [Clock:4] [Enter] Entering Critical Section
+2025/11/12 19:45:47.912042 [Node:1] [Clock:4] [CriticalSection] Executing critical operation
+2025/11/12 19:45:48.072542 [Node:1] [Clock:7] [Receive] Received REQUEST from 3 with timestamp 6
+2025/11/12 19:45:48.072557 [Node:1] [Clock:7] [Defer] Deferring reply to 3 (MyState:2, MyTime:4, TheirTime:6)
+2025/11/12 19:45:49.912691 [Node:1] [Clock:7] [CriticalSection] Completed critical operation
+2025/11/12 19:45:49.912738 [Node:1] [Clock:8] [Release] Released Critical Section, sending 1 deferred replies
+2025/11/12 19:45:49.912755 [Node:1] [Clock:9] [Send] Sending deferred REPLY to 3
+2025/11/12 19:45:50.625993 [Node:1] [Clock:10] [Receive] Received REQUEST from 2 with timestamp 8
+2025/11/12 19:45:50.626011 [Node:1] [Clock:10] [Grant] Granting REQUEST to 2 immediately
+2025/11/12 19:45:53.913511 [Node:1] [Clock:11] [Request] Requesting Critical Section at time 11
+2025/11/12 19:45:53.913566 [Node:1] [Clock:11] [Send] Sending REQUEST to 3 with timestamp 11
+2025/11/12 19:45:53.913571 [Node:1] [Clock:11] [Send] Sending REQUEST to 2 with timestamp 11
+2025/11/12 19:45:53.913847 [Node:1] [Clock:11] [Defer] 2 deferred our request (will Reply later)
+2025/11/12 19:45:53.913851 [Node:1] [Clock:11] [Grant] Received grant 1/2
+2025/11/12 19:45:53.914977 [Node:1] [Clock:12] [Receive] Received REPLY from 2
+2025/11/12 19:45:53.914992 [Node:1] [Clock:12] [Grant] Received grant 2/2
+2025/11/12 19:45:53.915008 [Node:1] [Clock:12] [Enter] Entering Critical Section
+2025/11/12 19:45:53.915021 [Node:1] [Clock:12] [CriticalSection] Executing critical operation
+2025/11/12 19:45:55.916068 [Node:1] [Clock:12] [CriticalSection] Completed critical operation
+2025/11/12 19:45:55.916103 [Node:1] [Clock:13] [Release] Released Critical Section, sending 0 deferred replies
+2025/11/12 19:45:56.915925 [Node:1] [Clock:14] [Receive] Received REQUEST from 3 with timestamp 13
+2025/11/12 19:45:56.915941 [Node:1] [Clock:14] [Grant] Granting REQUEST to 3 immediately
+2025/11/12 19:45:56.916025 [Node:1] [Clock:16] [Receive] Received REQUEST from 2 with timestamp 15
+2025/11/12 19:45:56.916036 [Node:1] [Clock:16] [Grant] Granting REQUEST to 2 immediately
+2025/11/12 19:46:00.917728 [Node:1] [Clock:17] [Request] Requesting Critical Section at time 17
+2025/11/12 19:46:00.917780 [Node:1] [Clock:17] [Send] Sending REQUEST to 3 with timestamp 17
+2025/11/12 19:46:00.917777 [Node:1] [Clock:17] [Send] Sending REQUEST to 2 with timestamp 17
+2025/11/12 19:46:00.918050 [Node:1] [Clock:17] [Grant] Received grant 1/2
+2025/11/12 19:46:00.918068 [Node:1] [Clock:17] [Grant] Received grant 2/2
+2025/11/12 19:46:00.918076 [Node:1] [Clock:17] [Enter] Entering Critical Section
+2025/11/12 19:46:00.918089 [Node:1] [Clock:17] [CriticalSection] Executing critical operation
+2025/11/12 19:46:02.918766 [Node:1] [Clock:17] [CriticalSection] Completed critical operation
+2025/11/12 19:46:02.918814 [Node:1] [Clock:18] [Release] Released Critical Section, sending 0 deferred replies
+2025/11/12 19:46:03.918896 [Node:1] [Clock:21] [Receive] Received REQUEST from 3 with timestamp 20
+2025/11/12 19:46:03.918920 [Node:1] [Clock:21] [Grant] Granting REQUEST to 3 immediately

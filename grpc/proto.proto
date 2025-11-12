@@ -1,29 +1,22 @@
 syntax = "proto3";
 
 package mutex;
-option go_package = "DistributedSystems/mutexpb";
+option go_package = "distributedsystems/grpc;mutex";
 
 // Service for Ricart-Agrawala mutual exclusion
 service MutexService {
-  // Request access to critical section
   rpc Request(RequestMessage) returns (ReplyMessage);
-
-  // Reply to a request (used for deferred replies)
   rpc Reply(ReplyMessage) returns (Ack);
 }
 
-// Request message sent when a node wants to enter critical section
 message RequestMessage {
-  string node_id = 1;      // ID of the requesting node
-  int64 timestamp = 2;      // Lamport timestamp of the request
+  string node_id = 1;
+  int64 timestamp = 2;
 }
 
-// Reply message sent to grant permission
 message ReplyMessage {
-  string node_id = 1;      // ID of the replying node
+  string node_id = 1;
 }
 
-// Acknowledgment message
-message Ack {
-  // Empty acknowledgment
-}
+message Ack {}
+

@@ -1,0 +1,48 @@
+2025/11/12 19:45:32.063080 [Node:3] [Clock:0] [Discovery] Attempting to connect to peer 1 at localhost:5051
+2025/11/12 19:45:32.063269 [Node:3] [Clock:0] [Discovery] Successfully connected to peer 1
+2025/11/12 19:45:32.063281 [Node:3] [Clock:0] [Discovery] Attempting to connect to peer 2 at localhost:5052
+2025/11/12 19:45:32.063321 [Node:3] [Clock:0] [Discovery] Successfully connected to peer 2
+2025/11/12 19:45:32.064341 [Node:3] [Clock:1] [Startup] Node started on localhost:5053
+2025/11/12 19:45:44.624004 [Node:3] [Clock:3] [Receive] Received REQUEST from 2 with timestamp 2
+2025/11/12 19:45:44.624020 [Node:3] [Clock:3] [Grant] Granting REQUEST to 2 immediately
+2025/11/12 19:45:47.911909 [Node:3] [Clock:5] [Receive] Received REQUEST from 1 with timestamp 4
+2025/11/12 19:45:47.911924 [Node:3] [Clock:5] [Grant] Granting REQUEST to 1 immediately
+2025/11/12 19:45:48.072266 [Node:3] [Clock:6] [Request] Requesting Critical Section at time 6
+2025/11/12 19:45:48.072334 [Node:3] [Clock:6] [Send] Sending REQUEST to 2 with timestamp 6
+2025/11/12 19:45:48.072341 [Node:3] [Clock:6] [Send] Sending REQUEST to 1 with timestamp 6
+2025/11/12 19:45:48.072623 [Node:3] [Clock:6] [Defer] 1 deferred our request (will Reply later)
+2025/11/12 19:45:48.072666 [Node:3] [Clock:6] [Grant] Received grant 1/2
+2025/11/12 19:45:49.912917 [Node:3] [Clock:7] [Receive] Received REPLY from 1
+2025/11/12 19:45:49.912953 [Node:3] [Clock:7] [Grant] Received grant 2/2
+2025/11/12 19:45:49.912978 [Node:3] [Clock:7] [Enter] Entering Critical Section
+2025/11/12 19:45:49.912999 [Node:3] [Clock:7] [CriticalSection] Executing critical operation
+2025/11/12 19:45:50.625985 [Node:3] [Clock:9] [Receive] Received REQUEST from 2 with timestamp 8
+2025/11/12 19:45:50.626004 [Node:3] [Clock:9] [Defer] Deferring reply to 2 (MyState:2, MyTime:6, TheirTime:8)
+2025/11/12 19:45:51.913746 [Node:3] [Clock:9] [CriticalSection] Completed critical operation
+2025/11/12 19:45:51.913783 [Node:3] [Clock:10] [Release] Released Critical Section, sending 1 deferred replies
+2025/11/12 19:45:51.913803 [Node:3] [Clock:11] [Send] Sending deferred REPLY to 2
+2025/11/12 19:45:53.913749 [Node:3] [Clock:12] [Receive] Received REQUEST from 1 with timestamp 11
+2025/11/12 19:45:53.913764 [Node:3] [Clock:12] [Grant] Granting REQUEST to 1 immediately
+2025/11/12 19:45:56.915690 [Node:3] [Clock:13] [Request] Requesting Critical Section at time 13
+2025/11/12 19:45:56.915737 [Node:3] [Clock:13] [Send] Sending REQUEST to 2 with timestamp 13
+2025/11/12 19:45:56.915743 [Node:3] [Clock:13] [Send] Sending REQUEST to 1 with timestamp 13
+2025/11/12 19:45:56.916017 [Node:3] [Clock:13] [Grant] Received grant 1/2
+2025/11/12 19:45:56.916036 [Node:3] [Clock:16] [Grant] Received grant 2/2
+2025/11/12 19:45:56.916046 [Node:3] [Clock:16] [Enter] Entering Critical Section
+2025/11/12 19:45:56.916021 [Node:3] [Clock:16] [Receive] Received REQUEST from 2 with timestamp 15
+2025/11/12 19:45:56.916069 [Node:3] [Clock:16] [Defer] Deferring reply to 2 (MyState:2, MyTime:13, TheirTime:15)
+2025/11/12 19:45:56.916062 [Node:3] [Clock:16] [CriticalSection] Executing critical operation
+2025/11/12 19:45:58.916955 [Node:3] [Clock:16] [CriticalSection] Completed critical operation
+2025/11/12 19:45:58.916988 [Node:3] [Clock:17] [Release] Released Critical Section, sending 1 deferred replies
+2025/11/12 19:45:58.917008 [Node:3] [Clock:18] [Send] Sending deferred REPLY to 2
+2025/11/12 19:46:00.917965 [Node:3] [Clock:19] [Receive] Received REQUEST from 1 with timestamp 17
+2025/11/12 19:46:00.917982 [Node:3] [Clock:19] [Grant] Granting REQUEST to 1 immediately
+2025/11/12 19:46:03.918688 [Node:3] [Clock:20] [Request] Requesting Critical Section at time 20
+2025/11/12 19:46:03.918734 [Node:3] [Clock:20] [Send] Sending REQUEST to 2 with timestamp 20
+2025/11/12 19:46:03.918742 [Node:3] [Clock:20] [Send] Sending REQUEST to 1 with timestamp 20
+2025/11/12 19:46:03.918988 [Node:3] [Clock:20] [Grant] Received grant 1/2
+2025/11/12 19:46:03.918998 [Node:3] [Clock:20] [Grant] Received grant 2/2
+2025/11/12 19:46:03.919004 [Node:3] [Clock:20] [Enter] Entering Critical Section
+2025/11/12 19:46:03.919026 [Node:3] [Clock:20] [CriticalSection] Executing critical operation
+2025/11/12 19:46:05.919694 [Node:3] [Clock:20] [CriticalSection] Completed critical operation
+2025/11/12 19:46:05.919744 [Node:3] [Clock:21] [Release] Released Critical Section, sending 0 deferred replies

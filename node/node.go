@@ -1,9 +1,8 @@
 package main
 
 import (
-	Proto "DistributedSystems/grpc"
-
 	"context"
+	Proto "distributedsystems/grpc"
 	"fmt"
 	"log"
 	"math/rand"
@@ -19,6 +18,7 @@ import (
 )
 
 type NodeState int
+
 const (
 	RELEASED NodeState = iota
 	WANTED
@@ -227,7 +227,7 @@ func (n *Node) sendRequest(peer *PeerConnection, timestamp int64) {
 	}
 }
 
-//Receiving a request
+// Receiving a request
 func (n *Node) Request(ctx context.Context, req *Proto.RequestMessage) (*Proto.ReplyMessage, error) {
 	n.updateClock(req.Timestamp)
 
