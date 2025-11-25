@@ -5,22 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="40d52b05-9818-40e9-b9f7-f41e7ce3a835" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grpc/proto.proto" beforeDir="false" afterPath="$PROJECT_DIR$/grpc/proto.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node/node.go" beforeDir="false" afterPath="$PROJECT_DIR$/node/node.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
-    </list>
-    <list id="c69f88bc-6803-4ae4-8003-340142ba43af" name="Changes by chris" comment="">
-      <change beforePath="$PROJECT_DIR$/grpc/proto.proto" beforeDir="false" afterPath="$PROJECT_DIR$/grpc/proto.proto" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/node/node.go" beforeDir="false" afterPath="$PROJECT_DIR$/node/node.go" afterDir="false" />
     </list>
+    <list id="c69f88bc-6803-4ae4-8003-340142ba43af" name="Changes by chris" comment="" />
     <list id="3569db1e-891b-46cd-906b-730d6dc47014" name="Changes by osvald" comment="" />
-    <list id="99212ff2-b1d4-4430-a60c-7775bc3766cb" name="Changes by sebastianhsvendsen" comment="">
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grpc/proto.proto" beforeDir="false" afterPath="$PROJECT_DIR$/grpc/proto.proto" afterDir="false" />
-    </list>
+    <list id="99212ff2-b1d4-4430-a60c-7775bc3766cb" name="Changes by sebastianhsvendsen" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,73 +25,6 @@
   <component name="GOROOT" url="file:///usr/local/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/grpc/proto.proto">
-      <ranges>
-        <range start1="2" end1="4" start2="2" end2="2" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="5" end1="5" start2="3" end2="4" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="10" end1="11" start2="9" end2="9" changelist="99212ff2-b1d4-4430-a60c-7775bc3766cb" />
-        <range start1="19" end1="19" start2="17" end2="18" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/node/node.go">
-      <ranges>
-        <range start1="3" end1="4" start2="3" end2="5" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="14" end1="14" start2="15" end2="16" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="15" end1="15" start2="17" end2="18" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="18" end1="19" start2="21" end2="21" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="26" end1="27" start2="28" end2="30" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="43" end1="44" start2="46" end2="47" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="75" end1="76" start2="78" end2="78" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="89" end1="90" start2="91" end2="91" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="92" end1="93" start2="93" end2="94" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="100" end1="101" start2="101" end2="102" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="122" end1="123" start2="123" end2="124" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="134" end1="135" start2="135" end2="135" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="139" end1="141" start2="139" end2="140" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="143" end1="144" start2="142" end2="142" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="176" end1="177" start2="174" end2="174" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="181" end1="182" start2="178" end2="178" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="184" end1="184" start2="180" end2="182" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="193" end1="194" start2="191" end2="191" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="196" end1="197" start2="193" end2="193" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="204" end1="205" start2="200" end2="201" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="212" end1="216" start2="208" end2="219" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="219" end1="220" start2="222" end2="224" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="226" end1="228" start2="230" end2="230" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="229" end1="230" start2="231" end2="233" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="231" end1="236" start2="234" end2="236" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="239" end1="240" start2="239" end2="239" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="241" end1="241" start2="240" end2="243" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="243" end1="245" start2="245" end2="247" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="246" end1="246" start2="248" end2="249" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="247" end1="248" start2="250" end2="251" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="250" end1="251" start2="253" end2="254" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="253" end1="254" start2="256" end2="257" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="265" end1="266" start2="268" end2="269" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="269" end1="270" start2="272" end2="272" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="275" end1="276" start2="277" end2="277" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="287" end1="288" start2="288" end2="292" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="289" end1="290" start2="293" end2="293" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="310" end1="311" start2="313" end2="313" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="323" end1="324" start2="325" end2="326" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="328" end1="330" start2="330" end2="331" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="340" end1="341" start2="341" end2="342" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="344" end1="345" start2="345" end2="346" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="357" end1="358" start2="358" end2="359" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="365" end1="366" start2="366" end2="367" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="372" end1="373" start2="373" end2="373" changelist="c69f88bc-6803-4ae4-8003-340142ba43af" />
-        <range start1="375" end1="376" start2="375" end2="375" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/go.mod">
-      <ranges>
-        <range start1="0" end1="1" start2="0" end2="1" changelist="99212ff2-b1d4-4430-a60c-7775bc3766cb" />
-        <range start1="2" end1="3" start2="2" end2="3" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-        <range start1="10" end1="11" start2="10" end2="10" changelist="40d52b05-9818-40e9-b9f7-f41e7ce3a835" />
-      </ranges>
-    </file>
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
@@ -125,11 +47,11 @@
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
     "RunOnceActivity.go.migrated.go.modules.settings": "true",
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "git-widget-placeholder": "Mandatory4Osvald",
+    "git-widget-placeholder": "Mandatory5",
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/Users/andreasschioettmac/Documents/ITU/DistributedSystems",
+    "last_opened_file_path": "/Users/Osvald333",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
@@ -147,8 +69,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-gosdk-f466f9b0953e-3d2cccfc42a2-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-252.23892.530" />
-        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-GO-252.23892.530" />
+        <option value="bundled-gosdk-f466f9b0953e-3d2cccfc42a2-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-252.25557.187" />
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-GO-252.25557.187" />
       </set>
     </attachedChunks>
   </component>

@@ -1,22 +1,52 @@
 syntax = "proto3";
+package auction;
+option go_package = "./proto";
 
-package mutex;
-option go_package = "distributedsystems/grpc;mutex";
-
-// Service for Ricart-Agrawala mutual exclusion
-service MutexService {
-  rpc Request(RequestMessage) returns (ReplyMessage);
-  rpc Reply(ReplyMessage) returns (Ack);
+service AuctionService {
+  rpc Bid(BidRequest) returns (BidResponse);
+  rpc Result(ResultRequest) returns (ResultResponse);
+  rpc Replicate(ReplicateRequest) returns (ReplicateResponse);
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
 }
 
-message RequestMessage {
+message BidRequest {
+  string bidder = 1;
+  int32 amount = 2;
+}
+
+message BidResponse {
+  string outcome = 1; // "success", "fail", or "exception"
+}
+
+message ResultRequest {}
+
+message ResultResponse {
+  string message = 1;
+}
+
+message ReplicateRequest {
+  AuctionState state = 1;
+}
+
+message ReplicateResponse {
+  bool success = 1;
+}
+
+message HeartbeatRequest {
   string node_id = 1;
   int64 timestamp = 2;
 }
 
-message ReplyMessage {
-  string node_id = 1;
+message HeartbeatResponse {
+  bool ack = 1;
 }
 
-message Ack {}
-
+message AuctionState {
+  map<string, bool> bidders = 1;
+  map<string, int32> bids = 2;
+  int32 highest_bid = 3;
+  string highest_bidder = 4;
+  int64 start_time = 5;
+  int64 duration = 6;
+  bool is_over = 7;
+}

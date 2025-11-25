@@ -1,9 +1,0 @@
-[19:45:44.624] Node 2 entered critical section at Lamport time 2
-[19:45:47.912] Node 1 entered critical section at Lamport time 4
-[19:45:49.913] Node 3 entered critical section at Lamport time 7
-[19:45:51.914] Node 2 entered critical section at Lamport time 9
-[19:45:53.915] Node 1 entered critical section at Lamport time 12
-[19:45:56.916] Node 3 entered critical section at Lamport time 16
-[19:45:58.917] Node 2 entered critical section at Lamport time 17
-[19:46:00.918] Node 1 entered critical section at Lamport time 17
-[19:46:03.919] Node 3 entered critical section at Lamport time 20
