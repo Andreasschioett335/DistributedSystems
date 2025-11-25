@@ -37,7 +37,7 @@ type AuctionState struct {
 	StartTime int64
 	topBid    int32
 	topBidder string
-	Bids      map[string]int
+	Bids      map[string]int32
 }
 
 func newNode(id string, address string, peers []string, isLeader bool, Duration int64) *Node {
@@ -54,7 +54,7 @@ func newNode(id string, address string, peers []string, isLeader bool, Duration 
 			StartTime: time.Now().Unix(),
 			topBid:    0,
 			topBidder: "",
-			Bids:      make(map[string]int),
+			Bids:      make(map[string]int32),
 		},
 	}
 }
@@ -73,11 +73,11 @@ func (n *Node) startNode() {
 
 	go n.connectPeers()
 
-	go n.sendHeartbeat
+	go n.sendHeartbeat()
 
-	go n.checkHeartbeat
+	go n.checkHeartbeat()
 
-	go n.checkAuctionOver
+	go n.checkAuctionOver()
 
 	go func() {
 		err := n.grpcServer.Serve(listener)
@@ -258,6 +258,94 @@ func getResult(nodeAddress string) (string, error) {
 	}
 
 	return resp.Message, nil
+}
+
+func (n *Node) Bid(ctx context.Context, req *proto.BidRequest) (*proto.BidResponse, error) {
+	if !n.isLeader {
+		return &proto.BidResponse{Outcome: "exception"}, nil
+	}
+
+	n.stateMutex.RLock()
+	defer n.stateMutex.RUnlock()
+
+	if n.state.isOver {
+		return &proto.BidResponse{Outcome: "exception"}, nil
+	}
+
+	bidderName := req.Bidder
+	bidAmount := req.Amount
+
+	_, exist := n.state.Bids[bidderName]
+	if !exist {
+		n.state.Bids[bidderName] = 0
+	}
+
+	previousBid := n.state.Bids[bidderName]
+	if bidAmount <= previousBid {
+		return &proto.BidResponse{Outcome: "fail"}, nil
+	}
+
+	if bidAmount <= n.state.topBid {
+		return &proto.BidResponse{Outcome: "fail"}, nil
+	}
+
+	n.state.Bids[bidderName] = bidAmount
+	n.state.topBid = bidAmount
+	n.state.topBidder = bidderName
+
+	fmt.Printf("node %s New bid: %s with bid at %d\n", n.id, bidderName, bidAmount)
+
+	go n.replicateToBackups()
+
+	return &proto.BidResponse{Outcome: "success"}, nil
+
+}
+
+func (n *Node) Result(ctx context.Context, req *proto.ResultRequest) (*proto.ResultResponse, error) {
+	n.stateMutex.RLock()
+	defer n.stateMutex.RUnlock()
+
+	var msg string
+	if n.state.isOver {
+		if n.state.topBidder == "" {
+			msg = "Auction is over, no one bid anything"
+		} else {
+			msg = fmt.Sprintf("Auction is over, %s won with a bid of %d", n.state.topBidder, n.state.topBid)
+		}
+	} else {
+		if n.state.topBidder == "" {
+			msg = "Auction is still going but no one has bid yet"
+		} else {
+			msg = fmt.Sprintf("Auction is still going, the highest bid is %d by %s", n.state.topBid, n.state.topBidder)
+		}
+	}
+	return &proto.ResultResponse{Message: msg}, nil
+}
+
+func (n *Node) Replicate(ctx context.Context, req *proto.ReplicateRequest) (*proto.ReplicateResponse, error) {
+	n.stateMutex.RLock()
+
+	n.state.topBid = req.State.HighestBid
+	n.state.topBidder = req.State.HighestBidder
+	n.state.isOver = req.State.IsOver
+	n.state.StartTime = req.State.StartTime
+	n.state.Duration = req.State.Duration
+
+	for bidder, amount := range n.state.Bids {
+		n.state.Bids[bidder] = int32(amount)
+	}
+
+	n.stateMutex.Unlock()
+
+	return &proto.ReplicateResponse{Success: true}, nil
+}
+
+func (n *Node) Heartbeat(ctx context.Context, req *proto.HeartbeatRequest) (*proto.HeartbeatResponse, error) {
+	n.mu.Lock()
+	n.lastHeartbeat["leader"] = req.Timestamp
+	n.mu.Unlock()
+
+	return &proto.HeartbeatResponse{}, nil
 }
 
 func main() {
