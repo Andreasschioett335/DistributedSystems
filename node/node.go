@@ -45,7 +45,7 @@ type AuctionState struct {
 
 func newNode(id string, address string, peers []string, isLeader bool, Duration int64) *Node {
 	lastHeartbeat := make(map[string]int64)
-	lastHeartbeat["leader"] = time.Now().Unix() // Initialize to current time
+	lastHeartbeat["leader"] = time.Now().Unix()
 
 	return &Node{
 		id:            id,
@@ -67,7 +67,6 @@ func newNode(id string, address string, peers []string, isLeader bool, Duration 
 }
 
 func (n *Node) startNode() {
-	//server
 	listener, err := net.Listen("tcp", n.address)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -95,12 +94,11 @@ func (n *Node) startNode() {
 }
 
 func (n *Node) connectPeers() {
-	time.Sleep(2 * time.Second) // Give other nodes time to start
+	time.Sleep(5 * time.Second)
 
 	for i := 0; i < len(n.peers); i++ {
 		peerAddress := n.peers[i]
 
-		// Retry connection a few times
 		var conn *grpc.ClientConn
 		var err error
 		for retry := 0; retry < 5; retry++ {
@@ -159,7 +157,6 @@ func (n *Node) sendHeartbeat() {
 				_, err := client.Heartbeat(ctx, req)
 				if err != nil {
 					log.Printf("Failed to send heartbeat to %s: %v. Removing from peer list.", addr, err)
-					// Remove dead peer
 					n.clientMutex.Lock()
 					delete(n.peerClients, addr)
 					n.clientMutex.Unlock()
@@ -190,13 +187,11 @@ func (n *Node) checkHeartbeat() {
 
 func (n *Node) deadLeaderElect() {
 	n.mu.Lock()
-	// Reset heartbeat to prevent repeated elections
 	n.lastHeartbeat["leader"] = time.Now().Unix()
 	n.mu.Unlock()
 
-	// Find alive nodes by pinging them
 	var aliveNodes []string
-	aliveNodes = append(aliveNodes, n.address) // add myself
+	aliveNodes = append(aliveNodes, n.address)
 
 	n.clientMutex.RLock()
 	peerAddresses := make([]string, 0, len(n.peerClients))
@@ -205,7 +200,6 @@ func (n *Node) deadLeaderElect() {
 	}
 	n.clientMutex.RUnlock()
 
-	// Check each peer to see if it's alive
 	for _, peerAddr := range peerAddresses {
 		conn, err := grpc.Dial(peerAddr,
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -218,14 +212,12 @@ func (n *Node) deadLeaderElect() {
 			fmt.Printf("Peer %s is alive\n", peerAddr)
 		} else {
 			fmt.Printf("Peer %s is dead, removing from consideration\n", peerAddr)
-			// Remove dead peer from client list
 			n.clientMutex.Lock()
 			delete(n.peerClients, peerAddr)
 			n.clientMutex.Unlock()
 		}
 	}
 
-	// Elect leader based on lowest address among alive nodes
 	amILeader := true
 	for _, addr := range aliveNodes {
 		if addr < n.address {
@@ -248,7 +240,7 @@ func (n *Node) checkAuctionOver() {
 	ticker := time.NewTicker(time.Second)
 	for {
 		<-ticker.C
-		n.stateMutex.Lock() // Changed to Lock for write
+		n.stateMutex.Lock()
 		currentTime := time.Now().Unix()
 		elapsedTime := currentTime - n.state.StartTime
 		if !n.state.isOver && elapsedTime >= n.state.Duration {
@@ -351,7 +343,7 @@ func getResult(nodeAddress string) (string, error) {
 
 func (n *Node) Bid(ctx context.Context, req *proto.BidRequest) (*proto.BidResponse, error) {
 
-	n.stateMutex.Lock() // Changed to Lock for write
+	n.stateMutex.Lock()
 	defer n.stateMutex.Unlock()
 
 	if n.state.isOver {
@@ -408,7 +400,7 @@ func (n *Node) Result(ctx context.Context, req *proto.ResultRequest) (*proto.Res
 }
 
 func (n *Node) Replicate(ctx context.Context, req *proto.ReplicateRequest) (*proto.ReplicateResponse, error) {
-	n.stateMutex.Lock() // Changed to Lock for write
+	n.stateMutex.Lock()
 	defer n.stateMutex.Unlock()
 
 	n.state.topBid = req.State.HighestBid
@@ -489,7 +481,6 @@ func main() {
 			return
 		}
 
-		// Build peer addresses from remaining arguments
 		var peers []string
 		for i := 4; i < len(os.Args); i++ {
 			peerPort := os.Args[i]
@@ -497,8 +488,6 @@ func main() {
 		}
 
 		address := fmt.Sprintf("localhost:%d", port)
-
-		// Node 1 (lowest port) is the leader
 		isLeader := (nodeId == "1")
 
 		node := newNode(fmt.Sprintf("Node%s", nodeId), address, peers, isLeader, 100)
@@ -508,7 +497,6 @@ func main() {
 
 		node.startNode()
 
-		// Handle graceful shutdown
 		sigChan := make(chan os.Signal, 1)
 		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
