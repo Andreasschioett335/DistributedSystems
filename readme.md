@@ -28,5 +28,7 @@ Show auction result:
 go run node.go client result &lt;node-address&gt;
 
 Examples:
+
 go run node.go client bid localhost:5001 Alice 100
+
 go run node.go client result localhost:5001
