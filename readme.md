@@ -22,10 +22,10 @@ go run node.go node 1 5001 5002 5003
 Open a fourth terminal to run client commands.
 
 Place a bid:
-go run node.go client bid <node-address> <bidder> <amount>
+go run node.go client bid &lt;node-address&gt; &lt;bidder&gt; &lt;amount&gt;
 
 Show auction result:
-go run node.go client result <node-address>
+go run node.go client result &lt;node-address&gt;
 
 Examples:
 go run node.go client bid localhost:5001 Alice 100
