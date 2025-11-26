@@ -1,4 +1,4 @@
-package proto
+package main
 
 import (
 	"context"
@@ -6,7 +6,10 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
+	"strconv"
 	"sync"
+	"syscall"
 	"time"
 
 	proto "distributedsystems/grpc"
@@ -41,12 +44,16 @@ type AuctionState struct {
 }
 
 func newNode(id string, address string, peers []string, isLeader bool, Duration int64) *Node {
+	lastHeartbeat := make(map[string]int64)
+	lastHeartbeat["leader"] = time.Now().Unix() // Initialize to current time
+
 	return &Node{
 		id:            id,
 		address:       address,
 		peers:         peers,
 		isLeader:      isLeader,
-		lastHeartbeat: make(map[string]int64),
+		lastHeartbeat: lastHeartbeat,
+		peerClients:   make(map[string]proto.AuctionServiceClient),
 		mu:            sync.RWMutex{},
 		state: AuctionState{
 			isOver:    false,
@@ -88,15 +95,28 @@ func (n *Node) startNode() {
 }
 
 func (n *Node) connectPeers() {
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(2 * time.Second) // Give other nodes time to start
 
 	for i := 0; i < len(n.peers); i++ {
 		peerAddress := n.peers[i]
-		conn, err := grpc.Dial(peerAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+		// Retry connection a few times
+		var conn *grpc.ClientConn
+		var err error
+		for retry := 0; retry < 5; retry++ {
+			conn, err = grpc.Dial(peerAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+			if err == nil {
+				break
+			}
+			fmt.Printf("node %s: failed to connect to %s, retrying... (%d/5)\n", n.id, peerAddress, retry+1)
+			time.Sleep(1 * time.Second)
+		}
+
 		if err != nil {
-			log.Fatalf("did not connect: %v", err)
+			log.Printf("node %s: could not connect to peer %s: %v", n.id, peerAddress, err)
 			continue
 		}
+
 		client := proto.NewAuctionServiceClient(conn)
 
 		n.clientMutex.Lock()
@@ -115,14 +135,20 @@ func (n *Node) sendHeartbeat() {
 			continue
 		}
 		n.clientMutex.RLock()
-		var clients []proto.AuctionServiceClient
-		for _, client := range n.peerClients {
-			clients = append(clients, client)
+		var clients []struct {
+			client proto.AuctionServiceClient
+			addr   string
+		}
+		for addr, client := range n.peerClients {
+			clients = append(clients, struct {
+				client proto.AuctionServiceClient
+				addr   string
+			}{client, addr})
 		}
 		n.clientMutex.RUnlock()
 
-		for _, client := range clients {
-			go func(c proto.AuctionServiceClient) {
+		for _, c := range clients {
+			go func(client proto.AuctionServiceClient, addr string) {
 				ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 				defer cancel()
 
@@ -130,11 +156,15 @@ func (n *Node) sendHeartbeat() {
 					NodeId:    n.id,
 					Timestamp: time.Now().Unix(),
 				}
-				_, err := c.Heartbeat(ctx, req)
+				_, err := client.Heartbeat(ctx, req)
 				if err != nil {
-					log.Printf("failed to heartbeat: %v", err)
+					log.Printf("Failed to send heartbeat to %s: %v. Removing from peer list.", addr, err)
+					// Remove dead peer
+					n.clientMutex.Lock()
+					delete(n.peerClients, addr)
+					n.clientMutex.Unlock()
 				}
-			}(client)
+			}(c.client, c.addr)
 		}
 	}
 }
@@ -147,29 +177,58 @@ func (n *Node) checkHeartbeat() {
 			continue
 		}
 		n.mu.RLock()
-		lastHB := n.lastHeartbeat[n.id]
+		lastHB := n.lastHeartbeat["leader"]
 		n.mu.RUnlock()
 
 		currenttime := time.Now().Unix()
-		if currenttime-lastHB > 5 {
-			fmt.Printf("The leader is dead, long live the leader! ME: %s", n.id)
-			n.isLeader = true
+		if lastHB > 0 && currenttime-lastHB > 10 {
+			fmt.Printf("The leader is dead! Last heartbeat was %d seconds ago\n", currenttime-lastHB)
+			go n.deadLeaderElect()
 		}
 	}
 }
 
 func (n *Node) deadLeaderElect() {
-	n.clientMutex.RLock()
+	n.mu.Lock()
+	// Reset heartbeat to prevent repeated elections
+	n.lastHeartbeat["leader"] = time.Now().Unix()
+	n.mu.Unlock()
+
+	// Find alive nodes by pinging them
 	var aliveNodes []string
 	aliveNodes = append(aliveNodes, n.address) // add myself
-	for peerAddr := range n.peerClients {
-		aliveNodes = append(aliveNodes, peerAddr)
+
+	n.clientMutex.RLock()
+	peerAddresses := make([]string, 0, len(n.peerClients))
+	for addr := range n.peerClients {
+		peerAddresses = append(peerAddresses, addr)
 	}
 	n.clientMutex.RUnlock()
 
+	// Check each peer to see if it's alive
+	for _, peerAddr := range peerAddresses {
+		conn, err := grpc.Dial(peerAddr,
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithBlock(),
+			grpc.WithTimeout(500*time.Millisecond))
+
+		if err == nil {
+			conn.Close()
+			aliveNodes = append(aliveNodes, peerAddr)
+			fmt.Printf("Peer %s is alive\n", peerAddr)
+		} else {
+			fmt.Printf("Peer %s is dead, removing from consideration\n", peerAddr)
+			// Remove dead peer from client list
+			n.clientMutex.Lock()
+			delete(n.peerClients, peerAddr)
+			n.clientMutex.Unlock()
+		}
+	}
+
+	// Elect leader based on lowest address among alive nodes
 	amILeader := true
-	for i := 0; i < len(aliveNodes); i++ {
-		if aliveNodes[i] < n.address {
+	for _, addr := range aliveNodes {
+		if addr < n.address {
 			amILeader = false
 			break
 		}
@@ -178,8 +237,10 @@ func (n *Node) deadLeaderElect() {
 	n.isLeader = amILeader
 	if n.isLeader {
 		fmt.Printf("The leader is dead, LONG LIVE THE LEADER, ME: %s\n", n.id)
+		fmt.Printf("Alive nodes: %v\n", aliveNodes)
 	} else {
-		fmt.Printf("I (%s) bow the knee to our new leader", n.id)
+		fmt.Printf("I (%s) bow the knee to our new leader\n", n.id)
+		fmt.Printf("Alive nodes: %v\n", aliveNodes)
 	}
 }
 
@@ -187,17 +248,20 @@ func (n *Node) checkAuctionOver() {
 	ticker := time.NewTicker(time.Second)
 	for {
 		<-ticker.C
-		n.stateMutex.RLock()
+		n.stateMutex.Lock() // Changed to Lock for write
 		currentTime := time.Now().Unix()
 		elapsedTime := currentTime - n.state.StartTime
 		if !n.state.isOver && elapsedTime >= n.state.Duration {
 			n.state.isOver = true
-			fmt.Printf("I (%s) declare this auction to be over!", n.id)
-			if n.isLeader {
+			fmt.Printf("I (%s) declare this auction to be over!\n", n.id)
+			shouldReplicate := n.isLeader
+			n.stateMutex.Unlock()
+			if shouldReplicate {
 				go n.replicateToBackups()
 			}
+		} else {
+			n.stateMutex.Unlock()
 		}
-		n.stateMutex.RUnlock()
 	}
 }
 
@@ -286,12 +350,9 @@ func getResult(nodeAddress string) (string, error) {
 }
 
 func (n *Node) Bid(ctx context.Context, req *proto.BidRequest) (*proto.BidResponse, error) {
-	if !n.isLeader {
-		return &proto.BidResponse{Outcome: "exception"}, nil
-	}
 
-	n.stateMutex.RLock()
-	defer n.stateMutex.RUnlock()
+	n.stateMutex.Lock() // Changed to Lock for write
+	defer n.stateMutex.Unlock()
 
 	if n.state.isOver {
 		return &proto.BidResponse{Outcome: "exception"}, nil
@@ -323,7 +384,6 @@ func (n *Node) Bid(ctx context.Context, req *proto.BidRequest) (*proto.BidRespon
 	go n.replicateToBackups()
 
 	return &proto.BidResponse{Outcome: "success"}, nil
-
 }
 
 func (n *Node) Result(ctx context.Context, req *proto.ResultRequest) (*proto.ResultResponse, error) {
@@ -348,7 +408,8 @@ func (n *Node) Result(ctx context.Context, req *proto.ResultRequest) (*proto.Res
 }
 
 func (n *Node) Replicate(ctx context.Context, req *proto.ReplicateRequest) (*proto.ReplicateResponse, error) {
-	n.stateMutex.RLock()
+	n.stateMutex.Lock() // Changed to Lock for write
+	defer n.stateMutex.Unlock()
 
 	n.state.topBid = req.State.HighestBid
 	n.state.topBidder = req.State.HighestBidder
@@ -356,11 +417,9 @@ func (n *Node) Replicate(ctx context.Context, req *proto.ReplicateRequest) (*pro
 	n.state.StartTime = req.State.StartTime
 	n.state.Duration = req.State.Duration
 
-	for bidder, amount := range n.state.Bids {
+	for bidder, amount := range req.State.Bids {
 		n.state.Bids[bidder] = int32(amount)
 	}
-
-	n.stateMutex.Unlock()
 
 	return &proto.ReplicateResponse{Success: true}, nil
 }
@@ -375,8 +434,7 @@ func (n *Node) Heartbeat(ctx context.Context, req *proto.HeartbeatRequest) (*pro
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: go run node.go client bid <node-address> <bidder> <amount>")
-		fmt.Println("Or go run node.go client result <node-address>")
+		fmt.Println("Invalid usage, check readme for correct use")
 		return
 	}
 
@@ -400,7 +458,7 @@ func main() {
 				fmt.Println("Error sending bid:", err)
 				return
 			}
-			fmt.Println("Bids sent:", result)
+			fmt.Println("Bid result:", result)
 		} else if command == "result" {
 			if len(os.Args) != 4 {
 				fmt.Println("Invalid command, reason: length")
@@ -411,34 +469,54 @@ func main() {
 			result, err := getResult(nodeAddress)
 			if err != nil {
 				fmt.Println("Error getting result:", err)
+				return
 			}
 			fmt.Println(result)
 		}
 		return
 	}
 
-	var peers []string
-	var node1 = newNode("Node1", "localhost:5001", peers, true, 100)
-	var node2 = newNode("Node2", "localhost:5002", peers, false, 100)
-	var node3 = newNode("Node3", "localhost:5003", peers, false, 100)
+	if os.Args[1] == "node" {
+		if len(os.Args) < 4 {
+			fmt.Println("Invalid command: need at least node-id, port, and one peer")
+			return
+		}
 
-	var peers1 []string
-	peers1[0] = node2.address
-	peers1[1] = node3.address
-	node1.peers = peers1
+		nodeId := os.Args[2]
+		port, err := strconv.Atoi(os.Args[3])
+		if err != nil {
+			fmt.Println("Invalid port:", os.Args[3])
+			return
+		}
 
-	var peers2 []string
-	peers2[0] = node1.address
-	peers2[1] = node3.address
-	node2.peers = peers2
+		// Build peer addresses from remaining arguments
+		var peers []string
+		for i := 4; i < len(os.Args); i++ {
+			peerPort := os.Args[i]
+			peers = append(peers, fmt.Sprintf("localhost:%s", peerPort))
+		}
 
-	var peers3 []string
-	peers3[0] = node1.address
-	peers3[1] = node2.address
-	node3.peers = peers3
-	node1.startNode()
-	node2.startNode()
-	node3.startNode()
+		address := fmt.Sprintf("localhost:%d", port)
 
-	select {}
+		// Node 1 (lowest port) is the leader
+		isLeader := (nodeId == "1")
+
+		node := newNode(fmt.Sprintf("Node%s", nodeId), address, peers, isLeader, 100)
+
+		fmt.Printf("Starting node %s on %s (leader: %v)\n", nodeId, address, isLeader)
+		fmt.Printf("Peers: %v\n", peers)
+
+		node.startNode()
+
+		// Handle graceful shutdown
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+		<-sigChan
+		fmt.Println("\nShutting down gracefully...")
+		node.grpcServer.GracefulStop()
+		fmt.Println("Node stopped")
+		return
+	}
+
 }
