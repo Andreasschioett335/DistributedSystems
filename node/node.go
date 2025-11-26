@@ -158,6 +158,31 @@ func (n *Node) checkHeartbeat() {
 	}
 }
 
+func (n *Node) deadLeaderElect() {
+	n.clientMutex.RLock()
+	var aliveNodes []string
+	aliveNodes = append(aliveNodes, n.address) // add myself
+	for peerAddr := range n.peerClients {
+		aliveNodes = append(aliveNodes, peerAddr)
+	}
+	n.clientMutex.RUnlock()
+
+	amILeader := true
+	for i := 0; i < len(aliveNodes); i++ {
+		if aliveNodes[i] < n.address {
+			amILeader = false
+			break
+		}
+	}
+
+	n.isLeader = amILeader
+	if n.isLeader {
+		fmt.Printf("The leader is dead, LONG LIVE THE LEADER, ME: %s\n", n.id)
+	} else {
+		fmt.Printf("I (%s) bow the knee to our new leader", n.id)
+	}
+}
+
 func (n *Node) checkAuctionOver() {
 	ticker := time.NewTicker(time.Second)
 	for {
